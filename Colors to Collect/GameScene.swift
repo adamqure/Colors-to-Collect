@@ -20,7 +20,7 @@ class GameScene: SKScene {
     private var offBlackColor = UIColor.init(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
     private var offWhiteColor = UIColor.init(red: 0.98, green: 0.98, blue: 0.98, alpha: 1.0)
     private var orangeColor = UIColor.orange
-    private var blueColor = UIColor.blue
+    private var blueColor = UIColor.init(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0)
     
     // Selector for the current color
     private var colorSelection = 0
@@ -64,6 +64,10 @@ class GameScene: SKScene {
         static let fallingBlock : UInt32 = 2
     }
     
+    /**
+        Handler for when the scene is loaded
+        Set the initial state
+     */
     override func didMove(to view: SKView) {
         self.backgroundColor = offBlackColor
         
@@ -72,38 +76,49 @@ class GameScene: SKScene {
         spawnPlayer()
     }
     
-    
-    func touchDown(atPoint pos : CGPoint) {
-        touchedLocation = pos
-        
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        
-    }
-    
+    /**
+        Called when the user touches the screen
+        Move to the X coordinate of the touch
+     */
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchDown(atPoint: t.location(in: self))
+        for t in touches {
+            touchedLocation = t.location(in: self)
             
+            if isAlive {
+                player?.position.x = touchedLocation?.x ?? t.location(in: self).x
+            } else {
+                movePlayerOffScreen()
+            }
         }
     }
     
+    /**
+        Called when the user slides their finger across the screen while maintaining their touch
+        Move to the X coordinate of the touch
+     */
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+        for t in touches {
+            touchedLocation = t.location(in: self)
+            
+            if isAlive {
+                player?.position.x = touchedLocation?.x ?? t.location(in: self).x
+            } else {
+                movePlayerOffScreen()
+            }
+        }
     }
     
+    /**
+        Called when the user lifts their finger
+        Change the color of the user
+     */
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+        for t in touches {
+            touchedLocation = t.location(in: self)
+
+            changePlayerColor()
+        }
     }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
@@ -159,7 +174,7 @@ class GameScene: SKScene {
         Creates the falling block and sets its physics
      */
     func spawnFallingBlock() {
-        let randomX = Int(arc4random_uniform(500) + 300)
+        let randomX = Int(arc4random_uniform(UInt32(self.frame.width - 200)) + 300)
         
         fallingBlock = SKSpriteNode(color: offWhiteColor, size: fallingBlockSize)
         fallingBlock?.position = CGPoint(x: randomX, y: 1000)
@@ -172,5 +187,33 @@ class GameScene: SKScene {
         fallingBlock?.name = "fallingBlockName"
         
         self.addChild(fallingBlock!)
+    }
+    
+    // Moves the player off the screen
+    func movePlayerOffScreen() {
+        if !isAlive {
+            player?.position.x = -300
+        }
+    }
+    
+    // Changes the color that the player can collect
+    func changePlayerColor() {
+        colorSelection = colorSelection + 1
+        
+        switch colorSelection {
+            case 3:
+                player?.color = offWhiteColor
+                colorSelection = 0
+                break
+            case 2:
+                player?.color = blueColor
+                break
+            case 1:
+                player?.color = orangeColor
+                break
+            default:
+                player?.color = offWhiteColor
+                break
+        }
     }
 }
