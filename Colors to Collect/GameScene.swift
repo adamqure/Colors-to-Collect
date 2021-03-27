@@ -77,6 +77,7 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         playerStartingYPosition = self.frame.minY + 250 + playerSize.height
         self.backgroundColor = offBlackColor
+        physicsWorld.contactDelegate = self
         
         spawnMainLabel()
         spawnScoreLabel()
@@ -190,6 +191,7 @@ class GameScene: SKScene {
      */
     func spawnFallingBlock() {
         let randomX = Int.random(in: Int(self.frame.minX + 16)..<Int(self.frame.maxX - 16))
+        let colorOfBlock = Int.random(in: 0...2)
         
         fallingBlock = SKSpriteNode(color: offWhiteColor, size: fallingBlockSize)
         fallingBlock?.position = CGPoint(x: randomX, y: Int(self.frame.maxY))
@@ -200,6 +202,19 @@ class GameScene: SKScene {
         fallingBlock?.physicsBody?.contactTestBitMask = physicsCategory.player
         fallingBlock?.physicsBody?.isDynamic = true
         fallingBlock?.name = "fallingBlockName"
+        
+        // Set color of block depending on random value
+        switch colorOfBlock {
+            case 1:
+                fallingBlock?.color = orangeColor
+                fallingBlock?.name = "fallingBlock1"
+            case 2:
+                fallingBlock?.color = blueColor
+                fallingBlock?.name = "fallingBlock2"
+            default:
+                fallingBlock?.color = offWhiteColor
+                fallingBlock?.name = "fallingBlock0"
+        }
         
         startBlockFall()
         
@@ -227,7 +242,7 @@ class GameScene: SKScene {
      */
     func movePlayerOffScreen() {
         if !isAlive {
-            player?.position.x = -300
+            player?.position.x = self.frame.minX - 500
         }
     }
     
@@ -273,5 +288,71 @@ class GameScene: SKScene {
      */
     func setPlayerYPosition() {
         player?.position.y = playerStartingYPosition
+    }
+}
+
+/**
+    Phsyics delegate extension to handle block contact
+ */
+extension GameScene: SKPhysicsContactDelegate {
+    /**
+        Handles contact between two objects
+     */
+    func didBegin(_ contact: SKPhysicsContact) {
+        let firstBody = contact.bodyA
+        let secondBody = contact.bodyB
+        
+        // If the two colliding objects are the same type, then ignore the collision
+        guard firstBody.categoryBitMask != secondBody.categoryBitMask else {
+            return
+        }
+        
+        // Figure out which body is the player
+        if (firstBody.categoryBitMask == physicsCategory.player) {
+            handlePlayerBlockCollision(firstBody.node as! SKSpriteNode, secondBody.node as! SKSpriteNode)
+        } else {
+            handlePlayerBlockCollision(secondBody.node as! SKSpriteNode, firstBody.node as! SKSpriteNode)
+        }
+    }
+    
+    /**
+        Handler for player and falling block collision
+     */
+    func handlePlayerBlockCollision(_ player: SKSpriteNode, _ block: SKSpriteNode) {
+        //Ensure we are handling the correct contact
+        guard player.name == "playerName" else {
+            return
+        }
+        
+        if (colorSelection == 0 && block.name == "fallingBlock0") {
+            score += 1
+            block.removeFromParent()
+            updateScore()
+        } else if (colorSelection == 1 && block.name == "fallingBlock1") {
+            score += 1
+            block.removeFromParent()
+            updateScore()
+        } else if (colorSelection == 2 && block.name == "fallingBlock2") {
+            score += 1
+            block.removeFromParent()
+            updateScore()
+        } else {
+            gameOver()
+        }
+    }
+    
+    /**
+        Updates the score label
+     */
+    func updateScore() {
+        scoreLabel.text = "\(NSLocalizedString("score", comment: "Score: "))\(score)"
+    }
+    
+    /**
+        Signals the game over and shows the user the final score
+     */
+    func gameOver() {
+        isAlive = false
+        
     }
 }
