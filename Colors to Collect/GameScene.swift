@@ -58,6 +58,9 @@ class GameScene: SKScene {
     // Player Score
     private var score = 0
     
+    // Flag for if the game is over. Stops the app from responding to touch events
+    private var isGameOver = false
+    
     // Game state. On launch, the label will default to the startup text and the state will be false, prompting the user to play. On start, the state will be true. On loss, the state returns to false and the game over screen is displayed.
     private var isAlive = false
     
@@ -79,6 +82,10 @@ class GameScene: SKScene {
         self.backgroundColor = offBlackColor
         physicsWorld.contactDelegate = self
         
+        isGameOver = false
+        isAlive = false
+        score = 0
+        
         spawnMainLabel()
         spawnScoreLabel()
         spawnPlayer()
@@ -89,6 +96,10 @@ class GameScene: SKScene {
         Move to the X coordinate of the touch
      */
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isGameOver {
+            return
+        }
+        
         if !isAlive {
             //Start the game
             isAlive = true
@@ -112,6 +123,10 @@ class GameScene: SKScene {
         Move to the X coordinate of the touch
      */
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isGameOver {
+            return
+        }
+        
         for t in touches {
             touchedLocation = t.location(in: self)
             
@@ -144,11 +159,25 @@ class GameScene: SKScene {
         Generates the main label for the game and adds it to the scene
      */
     func spawnMainLabel() {
+        spawnLabel(title: NSLocalizedString("start", comment: "Start!"))
+    }
+    
+    /**
+        Generates the game over label
+     */
+    func spawnGameOverLabel() {
+        spawnLabel(title: NSLocalizedString("game_over", comment: "Game Over"))
+    }
+    
+    /**
+        Generates a label and adds it to the scene
+     */
+    func spawnLabel(title: String) {
         mainLabel = SKLabelNode(fontNamed: "Futura")
         mainLabel.fontSize = 100
         mainLabel.fontColor = offWhiteColor
         mainLabel.position = CGPoint(x: self.frame.midX, y: self.frame.maxY - 250)
-        mainLabel.text = NSLocalizedString("start", comment: "Start!")
+        mainLabel.text = title
         
         self.addChild(mainLabel)
     }
@@ -242,7 +271,7 @@ class GameScene: SKScene {
      */
     func movePlayerOffScreen() {
         if !isAlive {
-            player?.position.x = self.frame.minX - 500
+            player?.position.x = self.frame.minX
         }
     }
     
@@ -275,7 +304,9 @@ class GameScene: SKScene {
     func setFallingBlockTimer() {
         let wait = SKAction.wait(forDuration: fallingBlockSpawnTime)
         let spawn = SKAction.run {
-            self.spawnFallingBlock()
+            if self.isAlive {
+                self.spawnFallingBlock()
+            }
         }
         
         let sequence = SKAction.sequence([wait, spawn])
@@ -337,6 +368,7 @@ extension GameScene: SKPhysicsContactDelegate {
             block.removeFromParent()
             updateScore()
         } else {
+            player.removeFromParent()
             gameOver()
         }
     }
@@ -352,7 +384,27 @@ extension GameScene: SKPhysicsContactDelegate {
         Signals the game over and shows the user the final score
      */
     func gameOver() {
+        isGameOver = true
         isAlive = false
+        spawnGameOverLabel()
+        restartGame()
+    }
+    
+    /**
+        Signals the system to restart the game after 3 seconds
+     */
+    func restartGame() {
+        let wait = SKAction.wait(forDuration: 3.0)
+        let startGame = GameScene(fileNamed: "GameScene")
+        let transition = SKTransition.crossFade(withDuration: 1.0)
         
+        startGame?.scaleMode = SKSceneScaleMode.aspectFill
+        
+        let changeScene = SKAction.run {
+            self.view?.presentScene(startGame!, transition: transition)
+        }
+        
+        let sequence = SKAction.sequence([wait, changeScene])
+        self.run(SKAction.repeat(sequence, count: 1))
     }
 }

@@ -7,3 +7,4 @@
 */
 "start" = "Start!";
 "score" = "Score: ";
+"game_over" = "Game Over";
