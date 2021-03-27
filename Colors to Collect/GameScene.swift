@@ -17,10 +17,10 @@ class GameScene: SKScene {
         - Orange
         - Blue
      */
-    private var offBlackColor = UIColor.init(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
-    private var offWhiteColor = UIColor.init(red: 0.98, green: 0.98, blue: 0.98, alpha: 1.0)
-    private var orangeColor = UIColor.orange
-    private var blueColor = UIColor.init(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0)
+    private let offBlackColor = UIColor.init(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
+    private let offWhiteColor = UIColor.init(red: 0.98, green: 0.98, blue: 0.98, alpha: 1.0)
+    private let orangeColor = UIColor.orange
+    private let blueColor = UIColor.init(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0)
     
     // Selector for the current color
     private var colorSelection = 0
@@ -41,25 +41,25 @@ class GameScene: SKScene {
     private var scoreLabel = SKLabelNode()
     
     // Player size definition. We can make this smaller to make the game more difficult
-    private var playerSize = CGSize(width: 60, height: 60)
+    private let playerSize = CGSize(width: 90, height: 90)
     
     // Falling Block size definition. We can make this larger to make the game more difficult
-    private var fallingBlockSize = CGSize(width: 40, height: 40)
+    private let fallingBlockSize = CGSize(width: 40, height: 40)
     
     // Speed at which the block falls. We can make this larger to make the game more difficult
-    private var fallingBlockSpeed = 2.5
+    private let fallingBlockSpeed = 2.5
     
     // Spawn time for the falling block
-    private var fallingBlockSpawnTime = 1.5
+    private let fallingBlockSpawnTime = 1.5
     
     // Speed at which the falling block rotates
-    private var fallingBlockRotationSpeed = 1.0
+    private let fallingBlockRotationSpeed = 1.0
     
     // Player Score
     private var score = 0
     
     // Game state. On launch, the label will default to the startup text and the state will be false, prompting the user to play. On start, the state will be true. On loss, the state returns to false and the game over screen is displayed.
-    private var isAlive = true
+    private var isAlive = false
     
     // SpriteKit Physics Handling
     private struct physicsCategory {
@@ -67,18 +67,20 @@ class GameScene: SKScene {
         static let fallingBlock : UInt32 = 2
     }
     
+    // Player starting position
+    private var playerStartingYPosition: CGFloat = 0
+    
     /**
         Handler for when the scene is loaded
         Set the initial state
      */
     override func didMove(to view: SKView) {
+        playerStartingYPosition = self.frame.minY + 250 + playerSize.height
         self.backgroundColor = offBlackColor
         
         spawnMainLabel()
         spawnScoreLabel()
         spawnPlayer()
-        
-        setFallingBlockTimer()
     }
     
     /**
@@ -86,6 +88,13 @@ class GameScene: SKScene {
         Move to the X coordinate of the touch
      */
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if !isAlive {
+            //Start the game
+            isAlive = true
+            mainLabel.run(SKAction.removeFromParent())
+            setFallingBlockTimer()
+        }
+        
         for t in touches {
             touchedLocation = t.location(in: self)
             
@@ -127,6 +136,7 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        self.setPlayerYPosition()
     }
     
     /**
@@ -162,7 +172,7 @@ class GameScene: SKScene {
         player = SKSpriteNode(color: offWhiteColor, size: playerSize)
         player?.size = playerSize
         
-        player?.position = CGPoint(x: self.frame.midX, y: self.frame.minY + 250 + playerSize.height)
+        player?.position = CGPoint(x: self.frame.midX, y: playerStartingYPosition)
         
         player?.physicsBody = SKPhysicsBody(rectangleOf: player!.size)
         player?.physicsBody?.affectedByGravity = false
@@ -203,7 +213,7 @@ class GameScene: SKScene {
      */
     func startBlockFall() {
         let moveForward = SKAction.moveTo(y: self.frame.minY - 200, duration: fallingBlockSpeed)
-        let rotateAnimation = SKAction.rotate(byAngle: 1, duration: fallingBlockRotationSpeed)
+        let rotateAnimation = SKAction.rotate(byAngle: 2, duration: fallingBlockRotationSpeed)
         
         let destroy = SKAction.removeFromParent()
         
@@ -256,5 +266,12 @@ class GameScene: SKScene {
         let sequence = SKAction.sequence([wait, spawn])
     
         self.run(SKAction.repeatForever(sequence))
+    }
+    
+    /**
+        Reset's the y position to the starting Y position
+     */
+    func setPlayerYPosition() {
+        player?.position.y = playerStartingYPosition
     }
 }
