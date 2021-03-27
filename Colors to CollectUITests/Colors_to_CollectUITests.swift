@@ -39,4 +39,10 @@ class Colors_to_CollectUITests: XCTestCase {
             }
         }
     }
+    
+    func testStartGame() {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssert(app.otherElements["Start!"].exists)
+    }
 }
