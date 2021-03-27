@@ -65,12 +65,17 @@ class GameScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
+        self.backgroundColor = offBlackColor
         
+        spawnMainLabel()
+        spawnScoreLabel()
+        spawnPlayer()
     }
     
     
     func touchDown(atPoint pos : CGPoint) {
         touchedLocation = pos
+        
     }
     
     func touchMoved(toPoint pos : CGPoint) {
@@ -102,5 +107,70 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+    }
+    
+    /**
+        Generates the main label for the game and adds it to the scene
+     */
+    func spawnMainLabel() {
+        mainLabel = SKLabelNode(fontNamed: "Futura")
+        mainLabel.fontSize = 100
+        mainLabel.fontColor = offWhiteColor
+        mainLabel.position = CGPoint(x: self.frame.midX, y: self.frame.maxY - 250)
+        mainLabel.text = NSLocalizedString("start", comment: "Start!")
+        
+        self.addChild(mainLabel)
+    }
+    
+    /**
+        Generates the score label for the game and adds it to the scene
+     */
+    func spawnScoreLabel() {
+        scoreLabel = SKLabelNode(fontNamed: "Futura")
+        scoreLabel.fontSize = 50
+        scoreLabel.fontColor = offWhiteColor
+        scoreLabel.position = CGPoint(x: self.frame.midX, y: self.frame.minY + 150)
+        scoreLabel.text = "\(NSLocalizedString("score", comment: "Score: "))\(score)"
+        
+        self.addChild(scoreLabel)
+    }
+    
+    /**
+        Creates the player node and sets its phyiscs
+     */
+    func spawnPlayer() {
+        player = SKSpriteNode(color: offWhiteColor, size: playerSize)
+        player?.size = playerSize
+        
+        player?.position = CGPoint(x: self.frame.midX, y: self.frame.minY + 250 + playerSize.height)
+        
+        player?.physicsBody = SKPhysicsBody(rectangleOf: player!.size)
+        player?.physicsBody?.affectedByGravity = false
+        player?.physicsBody?.allowsRotation = false
+        player?.physicsBody?.categoryBitMask = physicsCategory.player
+        player?.physicsBody?.contactTestBitMask = physicsCategory.fallingBlock
+        player?.physicsBody?.isDynamic = true
+        player?.name = "playerName"
+        
+        self.addChild(player!)
+    }
+    
+    /**
+        Creates the falling block and sets its physics
+     */
+    func spawnFallingBlock() {
+        let randomX = Int(arc4random_uniform(500) + 300)
+        
+        fallingBlock = SKSpriteNode(color: offWhiteColor, size: fallingBlockSize)
+        fallingBlock?.position = CGPoint(x: randomX, y: 1000)
+        fallingBlock?.physicsBody = SKPhysicsBody(rectangleOf: fallingBlock!.size)
+        fallingBlock?.physicsBody?.affectedByGravity = false
+        fallingBlock?.physicsBody?.allowsRotation = false
+        fallingBlock?.physicsBody?.categoryBitMask = physicsCategory.fallingBlock
+        fallingBlock?.physicsBody?.contactTestBitMask = physicsCategory.player
+        fallingBlock?.physicsBody?.isDynamic = true
+        fallingBlock?.name = "fallingBlockName"
+        
+        self.addChild(fallingBlock!)
     }
 }
