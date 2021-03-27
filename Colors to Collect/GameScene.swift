@@ -52,6 +52,9 @@ class GameScene: SKScene {
     // Spawn time for the falling block
     private var fallingBlockSpawnTime = 1.5
     
+    // Speed at which the falling block rotates
+    private var fallingBlockRotationSpeed = 1.0
+    
     // Player Score
     private var score = 0
     
@@ -74,6 +77,8 @@ class GameScene: SKScene {
         spawnMainLabel()
         spawnScoreLabel()
         spawnPlayer()
+        
+        setFallingBlockTimer()
     }
     
     /**
@@ -174,10 +179,10 @@ class GameScene: SKScene {
         Creates the falling block and sets its physics
      */
     func spawnFallingBlock() {
-        let randomX = Int(arc4random_uniform(UInt32(self.frame.width - 200)) + 300)
+        let randomX = Int.random(in: Int(self.frame.minX + 16)..<Int(self.frame.maxX - 16))
         
         fallingBlock = SKSpriteNode(color: offWhiteColor, size: fallingBlockSize)
-        fallingBlock?.position = CGPoint(x: randomX, y: 1000)
+        fallingBlock?.position = CGPoint(x: randomX, y: Int(self.frame.maxY))
         fallingBlock?.physicsBody = SKPhysicsBody(rectangleOf: fallingBlock!.size)
         fallingBlock?.physicsBody?.affectedByGravity = false
         fallingBlock?.physicsBody?.allowsRotation = false
@@ -186,17 +191,39 @@ class GameScene: SKScene {
         fallingBlock?.physicsBody?.isDynamic = true
         fallingBlock?.name = "fallingBlockName"
         
+        startBlockFall()
+        
         self.addChild(fallingBlock!)
     }
     
-    // Moves the player off the screen
+    /**
+        Sends the block from the top to the bottom
+        Rotates the block repeatedly
+        Destroys the block on end
+     */
+    func startBlockFall() {
+        let moveForward = SKAction.moveTo(y: self.frame.minY - 200, duration: fallingBlockSpeed)
+        let rotateAnimation = SKAction.rotate(byAngle: 1, duration: fallingBlockRotationSpeed)
+        
+        let destroy = SKAction.removeFromParent()
+        
+        let sequence = SKAction.sequence([moveForward, destroy])
+        fallingBlock?.run(SKAction.repeatForever(rotateAnimation))
+        fallingBlock?.run(SKAction.repeatForever(sequence))
+    }
+    
+    /**
+        Moves the player off the screen
+     */
     func movePlayerOffScreen() {
         if !isAlive {
             player?.position.x = -300
         }
     }
     
-    // Changes the color that the player can collect
+    /**
+        Changes the color that the player can collect
+     */
     func changePlayerColor() {
         colorSelection = colorSelection + 1
         
@@ -215,5 +242,19 @@ class GameScene: SKScene {
                 player?.color = offWhiteColor
                 break
         }
+    }
+    
+    /**
+        Sets a timer to send a falling block repeatedly
+     */
+    func setFallingBlockTimer() {
+        let wait = SKAction.wait(forDuration: fallingBlockSpawnTime)
+        let spawn = SKAction.run {
+            self.spawnFallingBlock()
+        }
+        
+        let sequence = SKAction.sequence([wait, spawn])
+    
+        self.run(SKAction.repeatForever(sequence))
     }
 }
