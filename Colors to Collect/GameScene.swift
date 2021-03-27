@@ -18,27 +18,27 @@ class GameScene: SKScene {
         - Blue
      */
     private let offBlackColor = UIColor.init(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
-    private let offWhiteColor = UIColor.init(red: 0.98, green: 0.98, blue: 0.98, alpha: 1.0)
-    private let orangeColor = UIColor.orange
-    private let blueColor = UIColor.init(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0)
+    internal let offWhiteColor = UIColor.init(red: 0.98, green: 0.98, blue: 0.98, alpha: 1.0)
+    internal let orangeColor = UIColor.orange
+    internal let blueColor = UIColor.init(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0)
     
     // Selector for the current color
-    private var colorSelection = 0
+    internal var colorSelection = 0
     
     // Location selected by the user
-    private var touchedLocation: CGPoint? = CGPoint()
+    internal var touchedLocation: CGPoint? = CGPoint()
     
     // Player sprite
-    private var player: SKSpriteNode? = SKSpriteNode()
+    internal var player: SKSpriteNode? = SKSpriteNode()
     
     // Falling block
-    private var fallingBlock: SKSpriteNode? = SKSpriteNode()
+    internal var fallingBlock: SKSpriteNode? = SKSpriteNode()
     
     // Main Label that shows main text
-    private var mainLabel = SKLabelNode()
+    internal var mainLabel = SKLabelNode()
     
     // Score label
-    private var scoreLabel = SKLabelNode()
+    internal var scoreLabel = SKLabelNode()
     
     // Player size definition. We can make this smaller to make the game more difficult
     private let playerSize = CGSize(width: 90, height: 90)
@@ -56,13 +56,13 @@ class GameScene: SKScene {
     private let fallingBlockRotationSpeed = 1.0
     
     // Player Score
-    private var score = 0
+    internal var score = 0
     
     // Flag for if the game is over. Stops the app from responding to touch events
-    private var isGameOver = false
+    internal var isGameOver = false
     
     // Game state. On launch, the label will default to the startup text and the state will be false, prompting the user to play. On start, the state will be true. On loss, the state returns to false and the game over screen is displayed.
-    private var isAlive = false
+    internal var isAlive = false
     
     // SpriteKit Physics Handling
     private struct physicsCategory {
@@ -71,7 +71,13 @@ class GameScene: SKScene {
     }
     
     // Player starting position
-    private var playerStartingYPosition: CGFloat = 0
+    internal var playerStartingYPosition: CGFloat = 0
+    
+    // Screen Min
+    internal var screenMin: CGFloat = 0
+    
+    // Screen Max
+    internal var screenMax: CGFloat = 0
     
     /**
         Handler for when the scene is loaded
@@ -152,6 +158,8 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        self.screenMin = self.frame.minX
+        self.screenMax = self.frame.maxX
         self.setPlayerYPosition()
     }
     
@@ -219,7 +227,7 @@ class GameScene: SKScene {
         Creates the falling block and sets its physics
      */
     func spawnFallingBlock() {
-        let randomX = Int.random(in: Int(self.frame.minX + 16)..<Int(self.frame.maxX - 16))
+        let randomX = Int.random(in: Int(screenMin + 16)..<Int(screenMax - 16))
         let colorOfBlock = Int.random(in: 0...2)
         
         fallingBlock = SKSpriteNode(color: offWhiteColor, size: fallingBlockSize)
