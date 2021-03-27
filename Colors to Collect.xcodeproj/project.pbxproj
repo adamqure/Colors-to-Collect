@@ -16,6 +16,7 @@
 		048DBEBA260FA06700483269 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 048DBEB9260FA06700483269 /* Assets.xcassets */; };
 		048DBEC5260FA06700483269 /* Colors_to_CollectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DBEC4260FA06700483269 /* Colors_to_CollectTests.swift */; };
 		048DBED0260FA06700483269 /* Colors_to_CollectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DBECF260FA06700483269 /* Colors_to_CollectUITests.swift */; };
+		048DBEE1260FA89400483269 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 048DBEE0260FA89400483269 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		048DBECB260FA06700483269 /* Colors to CollectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Colors to CollectUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		048DBECF260FA06700483269 /* Colors_to_CollectUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors_to_CollectUITests.swift; sourceTree = "<group>"; };
 		048DBED1260FA06700483269 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		048DBEE0260FA89400483269 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 				048DBEB6260FA06600483269 /* Main.storyboard */,
 				048DBEB9260FA06700483269 /* Assets.xcassets */,
 				048DBEBB260FA06700483269 /* Info.plist */,
+				048DBEE0260FA89400483269 /* Localizable.strings */,
 			);
 			path = "Colors to Collect";
 			sourceTree = "<group>";
@@ -234,6 +237,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				048DBEE1260FA89400483269 /* Localizable.strings in Resources */,
 				048DBEB8260FA06600483269 /* Main.storyboard in Resources */,
 				048DBEAF260FA06600483269 /* GameScene.sks in Resources */,
 				048DBEBA260FA06700483269 /* Assets.xcassets in Resources */,

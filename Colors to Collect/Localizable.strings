@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  Colors to Collect
+
+  Created by Adam Ure on 3/27/21.
+  
+*/
+"start" = "Start!";
+"score" = "Score: ";
